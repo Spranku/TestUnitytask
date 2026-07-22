@@ -16,10 +16,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             SpawnPlayer();
         }
-        else
-        {
-            ///Debug.Log("GameManager::Start - Not ConnectedAndReady for spawn");
-        }
     }
 
     public override void OnJoinedRoom()
@@ -32,11 +28,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void SpawnPlayer()
     {
-        if (playerPrefab == null)
-        {
-           /// Debug.Log("GameManager::SpawnPlayer - prefab missing");
-            return;
-        }
+        if (playerPrefab == null) return;
+        
 
         /* Do nothing? */
         if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("IsSpawned"))
@@ -51,16 +44,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             ExitGames.Client.Photon.Hashtable props = new ExitGames.Client.Photon.Hashtable();
             props.Add("IsSpawned", true);
             PhotonNetwork.LocalPlayer.SetCustomProperties(props);
-
-            ///if (debugMode) Debug.Log("GameManager::SpawnPlayer - player " + PhotonNetwork.NickName + " success spawned");
-        }
-        else
-        {
-            ///Debug.Log("GameManager::SpawnPlayer - Failed to spawn player " + PhotonNetwork.NickName);
         }
     }
-
-    ///public override void OnPlayerEnteredRoom(Player newPlayer) { if (debugMode) Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " joined room"); }
-
-    ///public override void OnPlayerLeftRoom(Player otherPlayer) { if (debugMode) Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " leaved room"); }
 }

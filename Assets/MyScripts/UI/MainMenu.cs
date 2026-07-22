@@ -292,7 +292,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
         if (roomList.Count == 0)
         {
-            Debug.Log("MainMenu::DisplayRooms - roomList empty");
+            ///Debug.Log("MainMenu::DisplayRooms - roomList empty");
             return;
         }
 
@@ -302,20 +302,20 @@ public class MainMenu : MonoBehaviourPunCallbacks
             RoomInfo room = roomEntry.Value;
             CreateRoomUI(room);
         }
-        Debug.Log("MainMenu::DisplayRooms - Show " + roomList.Count + " rooms");
+        ///Debug.Log("MainMenu::DisplayRooms - Show " + roomList.Count + " rooms");
     }
 
     private void CreateRoomUI(RoomInfo room)
     {
         if (roomHorizontalGroup == null)
         {
-            Debug.Log("MainMenu::CreateRoomUI - roomHorizontalGroup prefab are missing");
+            ///Debug.Log("MainMenu::CreateRoomUI - roomHorizontalGroup prefab are missing");
             return;
         }
 
         if (listGroupRooms == null)
         {
-            Debug.Log("MainMenu::CreateRoomUI - listGroupRooms are missing");
+            ///Debug.Log("MainMenu::CreateRoomUI - listGroupRooms are missing");
             return;
         }
 
