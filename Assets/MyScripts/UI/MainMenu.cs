@@ -20,8 +20,6 @@ public class MainMenu : MonoBehaviourPunCallbacks
     [SerializeField]
     public Button closeButton;
     [SerializeField]
-    public Button roomButton;
-    [SerializeField]
     public Button hostButton;
     [SerializeField]
     public Button clientButton;
@@ -37,12 +35,6 @@ public class MainMenu : MonoBehaviourPunCallbacks
     public VerticalLayoutGroup listGroupRooms;
     [SerializeField] 
     public HorizontalLayoutGroup roomHorizontalGroup;
-
-    [Header("Count of players")]
-    [SerializeField]
-    public TextMeshProUGUI currentPlayersText;
-    [SerializeField]
-    public TextMeshProUGUI maxPlayersText;
 
     [Header("Animations")]
     [SerializeField]
@@ -96,7 +88,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
     /* Buttons */
     public void OnQuitButton() 
     {
-        Debug.Log("MainMenu::OnQuitButton - Success quit");
+        ///Debug.Log("MainMenu::OnQuitButton - Success quit");
         Application.Quit(); 
     }
 
@@ -104,20 +96,6 @@ public class MainMenu : MonoBehaviourPunCallbacks
     { 
         /* TODO: Single game? */
         PhotonNetwork.LoadLevel(1);
-    }
-
-    private void OnRoomButtonClicked(string roomName)
-    {
-        Debug.Log("MainMenu::OnRoomButtonClicked - Room button " + roomName + " pressed");
-
-        if (string.IsNullOrEmpty(playerNicknameString))
-        {
-            Debug.LogError("MainMenu::OnRoomButtonClicked - Nickname wrong");
-            return;
-        }
-
-        PhotonNetwork.NickName = playerNicknameString;
-        PhotonNetwork.JoinRoom(roomName);
     }
 
     public void OnCloseButton()
@@ -137,16 +115,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
         playerNicknameText.interactable = true;
     }
 
-    /* Do nothing? */
-    //public void OnRoomButton()
-    //{
-    //    PhotonNetwork.NickName = playerNicknameString;
-    //    PhotonNetwork.JoinLobby();
-    //}
-
     public void OnHostButton()
     {
-        Debug.Log("MainMenu::OnHostButton - OnHostButton pressed");
+        ///Debug.Log("MainMenu::OnHostButton - OnHostButton pressed");
 
         /* Can`t change nickname when user choiced game mode */
         playerNicknameText.interactable = false;
@@ -167,7 +138,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
     public void OnClientButton()
     {
-        Debug.Log("MainMenu::OnClientButton - OnClientButton pressed");
+       ///Debug.Log("MainMenu::OnClientButton - OnClientButton pressed");
 
         /* Can`t change nickname when user choiced game mode */
         playerNicknameText.interactable = false;
@@ -186,17 +157,31 @@ public class MainMenu : MonoBehaviourPunCallbacks
             {
                 if (!PhotonNetwork.InLobby)
                 {
-                    Debug.Log("MainMenu::OnClientButton - Joint lobby for search any rooms...");
+                    ///Debug.Log("MainMenu::OnClientButton - Joint lobby for search any rooms...");
                     PhotonNetwork.JoinLobby();
                 }
                 else
                 {
-                    Debug.Log("MainMenu::OnClientButton - Update list of rooms (leave&join again)");
+                    ///Debug.Log("MainMenu::OnClientButton - Update list of rooms (leave&join again)");
                     PhotonNetwork.LeaveLobby();
                     PhotonNetwork.JoinLobby();
                 }
             }
         }
+    }
+
+    private void OnRoomButtonClicked(string roomName)
+    {
+        Debug.Log("MainMenu::OnRoomButtonClicked - Room button " + roomName + " pressed");
+
+        if (string.IsNullOrEmpty(playerNicknameString))
+        {
+            ///Debug.LogError("MainMenu::OnRoomButtonClicked - Nickname wrong");
+            return;
+        }
+
+        PhotonNetwork.NickName = playerNicknameString;
+        PhotonNetwork.JoinRoom(roomName);
     }
 
     public void OnPlayerNicknameChanged()
@@ -274,13 +259,13 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom()
     {
-        Debug.Log("MainMenu::OnCreatedRoom - The room" + PhotonNetwork.CurrentRoom.Name + " was created!");
+        ///Debug.Log("MainMenu::OnCreatedRoom - The room" + PhotonNetwork.CurrentRoom.Name + " was created!");
         PhotonNetwork.LoadLevel(1);
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("MainMenu::OnJoinedRoom - Success join to" + PhotonNetwork.CurrentRoom.Name + " room");
+        ///Debug.Log("MainMenu::OnJoinedRoom - Success join to" + PhotonNetwork.CurrentRoom.Name + " room");
 
         foreach (var player in PhotonNetwork.CurrentRoom.Players)
         {
@@ -290,15 +275,15 @@ public class MainMenu : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster()
     {
-        Debug.Log("MainMenu::OnConnectedToMaster - Success connect tot master-server Photon");
+        ///Debug.Log("MainMenu::OnConnectedToMaster - Success connect tot master-server Photon");
         PhotonNetwork.JoinLobby();
     }
 
-    public override void OnDisconnected(DisconnectCause cause) { Debug.Log("MainMenu::OnDisconnected - Disconected from Photon, error: " + cause); }
+    ///public override void OnDisconnected(DisconnectCause cause) { Debug.Log("MainMenu::OnDisconnected - Disconected from Photon, error: " + cause); }
 
-    public override void OnJoinRandomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRandomFailed - there are no any open rooms"); }
+    ///public override void OnJoinRandomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRandomFailed - there are no any open rooms"); }
 
-    public override void OnJoinRoomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRoomFailed - Connected to room failed, error code: " + returnCode + " Message: " + message); }
+    ///public override void OnJoinRoomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRoomFailed - Connected to room failed, error code: " + returnCode + " Message: " + message); }
     
     /* UI */
     private void DisplayRooms()
@@ -360,14 +345,14 @@ public class MainMenu : MonoBehaviourPunCallbacks
         {
             if (text.transform.parent != roomButton?.transform)
             {
-                text.text = $"Players {room.PlayerCount}/{room.MaxPlayers}";
+                text.text = $"{room.PlayerCount}/{room.MaxPlayers}";
             }
         }
 
         /* Saving for clearing */
         roomUIElements.Add(roomElement);
 
-        Debug.Log("MainMenu::CreateRoomUI - Was created row for room: " + room.Name + " cur: " + room.PlayerCount + " max:" + room.MaxPlayers);
+        ///Debug.Log("MainMenu::CreateRoomUI - Was created row for room: " + room.Name + " cur: " + room.PlayerCount + " max:" + room.MaxPlayers);
     }
 
     private void ClearRoomUI()

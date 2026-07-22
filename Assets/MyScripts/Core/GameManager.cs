@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            Debug.Log("GameManager::Start - Not ConnectedAndReady for spawn");
+            ///Debug.Log("GameManager::Start - Not ConnectedAndReady for spawn");
         }
     }
 
@@ -34,15 +34,14 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (playerPrefab == null)
         {
-            Debug.Log("GameManager::SpawnPlayer - prefab missing");
+           /// Debug.Log("GameManager::SpawnPlayer - prefab missing");
             return;
         }
 
         /* Do nothing? */
         if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("IsSpawned"))
         {
-            if (debugMode)
-                Debug.Log("GameManager::SpawnPlayer - player " + PhotonNetwork.NickName + " already created, skip spawn");
+            ///if (debugMode) Debug.Log("GameManager::SpawnPlayer - player " + PhotonNetwork.NickName + " already created, skip spawn");
             return;
         }
 
@@ -53,26 +52,15 @@ public class GameManager : MonoBehaviourPunCallbacks
             props.Add("IsSpawned", true);
             PhotonNetwork.LocalPlayer.SetCustomProperties(props);
 
-            if (debugMode)
-            {
-                Debug.Log("GameManager::SpawnPlayer - player " + PhotonNetwork.NickName + " success spawned");
-            }
+            ///if (debugMode) Debug.Log("GameManager::SpawnPlayer - player " + PhotonNetwork.NickName + " success spawned");
         }
         else
         {
-            Debug.Log("GameManager::SpawnPlayer - Failed to spawn player " + PhotonNetwork.NickName);
+            ///Debug.Log("GameManager::SpawnPlayer - Failed to spawn player " + PhotonNetwork.NickName);
         }
     }
 
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        if (debugMode)
-            Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " joined room");
-    }
+    ///public override void OnPlayerEnteredRoom(Player newPlayer) { if (debugMode) Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " joined room"); }
 
-    public override void OnPlayerLeftRoom(Player otherPlayer)
-    {
-        if (debugMode)
-            Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " leaved room");
-    }
+    ///public override void OnPlayerLeftRoom(Player otherPlayer) { if (debugMode) Debug.Log("GameManager::SpawnPlayer - Player " + PhotonNetwork.NickName + " leaved room"); }
 }
