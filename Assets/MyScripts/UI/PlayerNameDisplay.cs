@@ -21,7 +21,7 @@ public class PlayerNameDisplay : MonoBehaviourPun
         
 
         /* Get nickname */
-        string playerName = photonView.Owner.NickName;
+        var playerName = photonView.Owner.NickName;
         if (string.IsNullOrEmpty(playerName))
         {
             playerName = $"Player_{photonView.Owner.ActorNumber}";

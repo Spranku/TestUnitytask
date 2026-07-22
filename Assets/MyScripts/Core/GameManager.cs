@@ -7,13 +7,10 @@ public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("Settings")]
     public GameObject playerPrefab;
-    public Vector3 spawnPosition = new Vector3(5, 0.5f, 0);
-
-    [Header("Debug")]
-    public bool debugMode = true;
+    public Vector3 spawnPosition = new Vector3(5, 5f, 5);
 
     private static GameManager instance;
-    private bool isSpawning = false;
+    private GameObject localPlayerObject;
 
     void Awake()
     {
@@ -32,28 +29,43 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() { TrySpawnPlayer(); }
 
-    public override void OnLeftRoom() { LoadMainMenu(); }
+    private void OnDestroy() { if (instance == this) instance = null; }
 
-    private void OnDestroy() { if (instance == this) instance = null;  }
+    public override void OnLeftRoom()
+    {
+        localPlayerObject = null;
+        LoadMainMenu();
+    }
 
     private void TrySpawnPlayer()
     {
         /* Safe check */
-        if (isSpawning) return;
         if (playerPrefab == null) return;
+        if (localPlayerObject != null) return;
         if (IsPlayerSpawned()) return;
 
-        isSpawning = true;
-        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
-        if (player != null) SetPlayerSpawned(true);
-        isSpawning = false;
+        /* Network check*/
+        if (!PhotonNetwork.IsConnectedAndReady || !PhotonNetwork.InRoom)
+        {
+            Invoke(nameof(TrySpawnPlayer), 0.1f);
+            return;
+        }
+
+        /* Spawn */
+        localPlayerObject = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
+
+        if (localPlayerObject != null)
+        {
+            SetPlayerSpawned(true);
+        }
     }
 
     private bool IsPlayerSpawned()
     {
         if (PhotonNetwork.LocalPlayer == null) return false;
 
-        return PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("IsSpawned") && (bool)PhotonNetwork.LocalPlayer.CustomProperties["IsSpawned"];
+        return PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("IsSpawned") &&
+               (bool)PhotonNetwork.LocalPlayer.CustomProperties["IsSpawned"];
     }
 
     private void SetPlayerSpawned(bool value)
@@ -67,7 +79,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void LeaveGame()
     {
-        /* Reset state */
+        localPlayerObject = null;
         SetPlayerSpawned(false);
 
         if (PhotonNetwork.InRoom)
@@ -76,7 +88,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            /* if user is not in room - load menu */
             LoadMainMenu();
         }
     }
@@ -92,4 +103,5 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         SceneManager.LoadScene(0);
     }
+
 }

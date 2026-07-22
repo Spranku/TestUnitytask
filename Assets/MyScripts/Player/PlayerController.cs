@@ -1,73 +1,129 @@
-using UnityEngine;
 using Photon.Pun;
-using Photon.Pun.Demo.Cockpit;
+using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+[RequireComponent(typeof(PhotonView))]
+[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerColor))]
+public class PlayerController : MonoBehaviourPun
 {
-    [Header("Movement")]
-    [SerializeField]
-    public float moveSpeed = 5.0f;
+    [Header("References")]
+    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private PlayerColor color;
+    [SerializeField] private PhotonView myPhotonView;
 
-    [Header("Color")]
-    [SerializeField]
-    public Color[] colors;
+    [Header("Network Settings")]
+    [SerializeField] private bool destroyRigidbodyOnRemote = true;
 
-    private PhotonView photonView;
-    private Renderer playerRenderer;
-    private int currentColorIndex = 0;
+    [Header("Debug")]
+    [SerializeField] private bool enableDebugLogs = false;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private Vector2 movementInput;
+    private bool jumpPressed;
+    private bool colorChangePressed;
+
+    private void Awake()
     {
-        photonView = GetComponent<PhotonView>();
-        playerRenderer = GetComponent<Renderer>();
-
-        /* Initialize comps */
-        photonView = GetComponent<PhotonView>();
-
-        playerRenderer = GetComponent<Renderer>();
-
-        /* Do nothing? */
-        if (!photonView.IsMine) Destroy(GetComponent<Rigidbody>()); 
+        ValidateComponents();
+        InitNetwork();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void ValidateComponents()
     {
-        /* Locally controlled */
-        if (!photonView.IsMine) return;
+        if (movement == null) movement = GetComponent<PlayerMovement>();
 
-        /* Simple movement */
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+        if (color == null) color = GetComponent<PlayerColor>();
 
-        var Direction = new Vector3(horizontal, 0, vertical).normalized;
-        transform.Translate(Direction * moveSpeed * Time.deltaTime, Space.World);
+        if (myPhotonView == null) myPhotonView = GetComponent<PhotonView>();
+    }
 
-        /* Colorize */
-        if (Input.GetKeyDown(KeyCode.Space))
+    private void InitNetwork()
+    {
+        if (!myPhotonView.IsMine)
         {
-            if (colors == null || colors.Length == 0)
+            /* Clear garbage comps from other players */
+            if (destroyRigidbodyOnRemote)
             {
-                Debug.LogWarning("PlayerController::Update - Array of colors empty!");
-                return;
-            }
-            currentColorIndex = (currentColorIndex + 1) % colors.Length;
-            Color newColor = colors[currentColorIndex];
-            if (playerRenderer != null)
-            {
-                playerRenderer.material.color = newColor;
-
-                /* RPC like multicast from UE */
-                photonView.RPC("SyncColor", RpcTarget.Others, newColor.r, newColor.g, newColor.b);
+                var rb = GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    Destroy(rb);
+                }
             }
 
+            /* Disable audio same! */
+            var listener = GetComponentInChildren<AudioListener>();
+            if (listener != null)
+            {
+                listener.enabled = false;
+            }
         }
     }
 
-    [PunRPC]
-    void SyncColor(float r, float g, float b)
+    #region Update Loop
+    private void Update()
     {
-        playerRenderer.material.color = new Color(r, g, b);
+        /* Only local */
+        if (!myPhotonView.IsMine) return;
+
+        ReadInput();
+        HandleMovement();
+        HandleJump();
+        HandleColorChange();
     }
+    #endregion
+
+    #region Input Handling
+    private void ReadInput()
+    {
+        movementInput = new Vector2(
+            Input.GetAxis("Horizontal"),
+            Input.GetAxis("Vertical")
+        );
+
+        if (movementInput.magnitude > 1f)
+        {
+            movementInput.Normalize();
+        }
+        jumpPressed = Input.GetButtonDown("Jump");
+        colorChangePressed = Input.GetKeyDown(KeyCode.Space);
+    }
+    #endregion
+
+    #region Movement Handling
+    private void HandleMovement()
+    {
+        if (movement == null) return;
+        movement.Move(movementInput);
+    }
+
+    private void HandleJump()
+    {
+        if (!jumpPressed || movement == null) return;
+        movement.Jump();
+    }
+    #endregion
+
+    #region Color Handling
+    private void HandleColorChange()
+    {
+        if (!colorChangePressed || color == null) return;
+        color.ChangeToNextColor();
+    }
+    #endregion
+
+    #region Public API
+    public PlayerMovement GetMovement() => movement;
+    public PlayerColor GetColor() => color;
+
+    public void SetControlEnabled(bool enabled)
+    {
+        this.enabled = enabled;
+        if (!enabled)
+        {
+            movementInput = Vector2.zero;
+            jumpPressed = false;
+            colorChangePressed = false;
+        }
+    }
+    #endregion
 }

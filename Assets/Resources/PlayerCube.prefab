@@ -16,6 +16,9 @@ GameObject:
   - component: {fileID: 5605573509119162561}
   - component: {fileID: 7812135858787964937}
   - component: {fileID: 5464523819666424490}
+  - component: {fileID: 8804727309436411040}
+  - component: {fileID: 8453591122333491438}
+  - component: {fileID: 7409987886123063739}
   m_Layer: 0
   m_Name: PlayerCube
   m_TagString: Untagged
@@ -168,13 +171,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e17786cfa9132a49a0c6f7bba05328e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
-  colors:
-  - {r: 1, g: 1, b: 1, a: 0}
-  - {r: 1, g: 0, b: 0, a: 0}
-  - {r: 0, g: 0.063622236, b: 1, a: 0}
-  - {r: 0.9381598, g: 1, b: 0, a: 0}
-  - {r: 0, g: 1, b: 0.019794226, a: 0}
+  movement: {fileID: 8453591122333491438}
+  color: {fileID: 7409987886123063739}
+  myPhotonView: {fileID: 8862450030384179461}
+  destroyRigidbodyOnRemote: 1
+  enableDebugLogs: 0
 --- !u!114 &5464523819666424490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +191,70 @@ MonoBehaviour:
   nameText: {fileID: 6463236166045187088}
   localPlayerColor: {r: 0, g: 1, b: 0, a: 1}
   otherPlayerColor: {r: 0, g: 0, b: 0, a: 1}
+--- !u!143 &8804727309436411040
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7415259875423368073}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8453591122333491438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7415259875423368073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d36ad96c585313c4f983d0fb03e3d3ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 5
+  jumpForce: 5
+  rotationSpeed: 10
+  jumpHeight: 2
+  gravity: -9.81
+--- !u!114 &7409987886123063739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7415259875423368073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c7de013b9482f146a5d1027f1cc0ca5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerColor
+  availableColors:
+  - {r: 1, g: 0, b: 0, a: 0}
+  - {r: 0, g: 1, b: 0, a: 0}
+  - {r: 0, g: 0, b: 1, a: 0}
+  - {r: 1, g: 1, b: 1, a: 0}
+  - {r: 0, g: 1, b: 0.95876384, a: 0}
+  - {r: 1, g: 0.945058, b: 0, a: 0}
+  - {r: 1, g: 0, b: 0.9053154, a: 0}
+  - {r: 0, g: 0, b: 0, a: 0}
+  colorProperty: _Color
 --- !u!1001 &3956251043333146174
 PrefabInstance:
   m_ObjectHideFlags: 0

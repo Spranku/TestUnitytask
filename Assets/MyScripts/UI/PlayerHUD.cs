@@ -9,7 +9,7 @@ public class PlayerHUD : MonoBehaviourPunCallbacks
         if (PhotonNetwork.InRoom)
         {
             /* Destrtoy game manager before leaving */
-            GameManager gm = FindFirstObjectByType<GameManager>();
+            var gm = FindFirstObjectByType<GameManager>();
             if (gm != null)
             {
                 Destroy(gm.gameObject);
@@ -30,7 +30,6 @@ public class PlayerHUD : MonoBehaviourPunCallbacks
     public override void OnLeftRoom()
     {
         PhotonNetwork.AutomaticallySyncScene = false;
-
         SceneManager.LoadScene(0);
     }
 }

@@ -85,7 +85,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
         }
     }
 
-    /* Buttons */
+    #region Buttons
     public void OnQuitButton() 
     {
         ///Debug.Log("MainMenu::OnQuitButton - Success quit");
@@ -125,7 +125,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
         PhotonNetwork.NickName = playerNicknameString;
 
         /* Setup&create room settings */
-        RoomOptions roomOptions = new RoomOptions();
+        var roomOptions = new RoomOptions();
         roomOptions.MaxPlayers = 4; // TODO: variable?
         roomOptions.IsVisible = true;
         roomOptions.IsOpen = true;
@@ -169,6 +169,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
             }
         }
     }
+
 
     private void OnRoomButtonClicked(string roomName)
     {
@@ -227,8 +228,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
             horizontalGroupGameMode.gameObject.SetActive(true);
         }
     }
+    #endregion
 
-    /* Network */
+    #region Network
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         Debug.Log("MainMenu::OnRoomListUpdate - List of rooms: " + roomList.Count + " rooms");
@@ -284,8 +286,9 @@ public class MainMenu : MonoBehaviourPunCallbacks
     ///public override void OnJoinRandomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRandomFailed - there are no any open rooms"); }
 
     ///public override void OnJoinRoomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRoomFailed - Connected to room failed, error code: " + returnCode + " Message: " + message); }
-    
-    /* UI */
+    #endregion
+
+    #region UI
     private void DisplayRooms()
     {
         ClearRoomUI();
@@ -387,4 +390,5 @@ public class MainMenu : MonoBehaviourPunCallbacks
         groupToClose.gameObject.SetActive(false);
         anim.Play(animationName, 0, 0f);
     }
+    #endregion
 }
