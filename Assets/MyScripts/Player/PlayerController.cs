@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        photonView = GetComponent<PhotonView>();
+        playerRenderer = GetComponent<Renderer>();
+
         /* Initialize comps */
         photonView = GetComponent<PhotonView>();
 
@@ -46,21 +49,25 @@ public class PlayerController : MonoBehaviour
         {
             if (colors == null || colors.Length == 0)
             {
-                Debug.LogWarning("Массив цветов пуст! Цвет не меняется.");
+                Debug.LogWarning("PlayerController::Update - Array of colors empty!");
                 return;
             }
             currentColorIndex = (currentColorIndex + 1) % colors.Length;
             Color newColor = colors[currentColorIndex];
-            playerRenderer.material.color = newColor;
+            if (playerRenderer != null)
+            {
+                playerRenderer.material.color = newColor;
 
-            /* RPC like multicast from UE */
-            photonView.RPC("SyncColor", RpcTarget.Others, newColor.r, newColor.g, newColor.b);
-        }
+                /* RPC like multicast from UE */
+                photonView.RPC("SyncColor", RpcTarget.Others, newColor.r, newColor.g, newColor.b);
+            }
 
-        [PunRPC]
-        void SyncColor(float r, float g, float b)
-        {
-            playerRenderer.material.color = new Color(r, g, b);
         }
+    }
+
+    [PunRPC]
+    void SyncColor(float r, float g, float b)
+    {
+        playerRenderer.material.color = new Color(r, g, b);
     }
 }
