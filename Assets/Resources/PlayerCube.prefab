@@ -189,6 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerNameDisplay
   nameText: {fileID: 6463236166045187088}
+  nameUI: {fileID: 4484487876996270637}
   localPlayerColor: {r: 0, g: 1, b: 0, a: 1}
   otherPlayerColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!143 &8804727309436411040
@@ -263,6 +264,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4569748912717886885}
     m_Modifications:
+    - target: {fileID: 6122853299022006, guid: 5bda02933b89d854fb4855677c134fad, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 638232046699580435, guid: 5bda02933b89d854fb4855677c134fad, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

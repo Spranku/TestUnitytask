@@ -7,15 +7,20 @@ using UnityEngine;
 public class PlayerController : MonoBehaviourPun
 {
     [Header("References")]
-    [SerializeField] private PlayerMovement movement;
-    [SerializeField] private PlayerColor color;
-    [SerializeField] private PhotonView myPhotonView;
+    [SerializeField] 
+    private PlayerMovement movement;
+    [SerializeField] 
+    private PlayerColor color;
+    [SerializeField] 
+    private PhotonView myPhotonView;
 
     [Header("Network Settings")]
-    [SerializeField] private bool destroyRigidbodyOnRemote = true;
+    [SerializeField] 
+    private bool destroyRigidbodyOnRemote = true;
 
     [Header("Debug")]
-    [SerializeField] private bool enableDebugLogs = false;
+    [SerializeField] 
+    private bool enableDebugLogs = false;
 
     private Vector2 movementInput;
     private bool jumpPressed;

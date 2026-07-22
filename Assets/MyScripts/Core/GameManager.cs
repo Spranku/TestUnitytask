@@ -51,6 +51,20 @@ public class GameManager : MonoBehaviourPunCallbacks
             return;
         }
 
+        /* Fix bugs with one spawn position*/
+        var spawnPos = spawnPosition;
+        if (PhotonNetwork.CurrentRoom != null)
+        {
+            /* Every player has new position for spawn */
+            var actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+            const float Radius = 5f;
+            var angle = (actorNumber - 1) * 72f; 
+            var rad = angle * Mathf.Deg2Rad;
+
+            spawnPos.x += Mathf.Cos(rad) * Radius;
+            spawnPos.z += Mathf.Sin(rad) * Radius; ; 
+        }
+
         /* Spawn */
         localPlayerObject = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
 
