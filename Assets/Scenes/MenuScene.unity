@@ -2094,7 +2094,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 6802634f3141f2b449b6e69de58fe478, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 66efb24ed46044ab8a039599cbc47d7b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2330,7 +2330,6 @@ MonoBehaviour:
   quitButton: {fileID: 827805854}
   playButton: {fileID: 402011534}
   closeButton: {fileID: 1137981030}
-  roomButton: {fileID: 0}
   hostButton: {fileID: 1504865145}
   clientButton: {fileID: 1469225126}
   playerNicknameText: {fileID: 1629321834}
@@ -2338,8 +2337,6 @@ MonoBehaviour:
   listGroup: {fileID: 1260482056}
   listGroupRooms: {fileID: 119401539}
   roomHorizontalGroup: {fileID: 1656108019537820186, guid: bbedde559a77f9146b30cfaa49c97325, type: 3}
-  currentPlayersText: {fileID: 0}
-  maxPlayersText: {fileID: 0}
   openMainAnimation: {fileID: 7400000, guid: 3cbe0d31bef1ce246be7cca22e3b5780, type: 2}
   closeMainAnimation: {fileID: 7400000, guid: 194605e61125480489a2dfcf1845dd8b, type: 2}
   ListAnimation: {fileID: 7400000, guid: a16fb4afd58492a41a80aadfb11c2f5c, type: 2}

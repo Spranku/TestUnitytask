@@ -68,7 +68,7 @@ public class MainMenu : MonoBehaviourPunCallbacks
     }
 
     void Start()
-    {
+    { 
         /* Photon will loading scenes */
         PhotonNetwork.AutomaticallySyncScene = true;
 
