@@ -93,9 +93,20 @@ public class MainMenu : MonoBehaviourPunCallbacks
     }
 
     public void OnPlayButton() 
-    { 
-        /* TODO: Single game? */
-        PhotonNetwork.LoadLevel(1);
+    {
+        if (string.IsNullOrEmpty(playerNicknameString)) return;
+        PhotonNetwork.NickName = playerNicknameString;
+
+        /* Leva if user is in room */
+        if (PhotonNetwork.InRoom)
+        {
+            PhotonNetwork.LeaveRoom();
+            pendingCreateRoom = true;
+            return;
+        }
+
+        /* Start search room */
+        StartCoroutine(FindOrCreateRoom());
     }
 
     public void OnCloseButton()
@@ -231,33 +242,29 @@ public class MainMenu : MonoBehaviourPunCallbacks
     #endregion
 
     #region Network
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    private void CreateNewRoom()
     {
-        Debug.Log("MainMenu::OnRoomListUpdate - List of rooms: " + roomList.Count + " rooms");
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = 4;
+        roomOptions.IsVisible = true;
+        roomOptions.IsOpen = true;
 
-        foreach (RoomInfo room in roomList)
+        if (PhotonNetwork.IsConnectedAndReady)
         {
-            if (room.RemovedFromList)
-            {
-                if (this.roomList.ContainsKey(room.Name))
-                {
-                    this.roomList.Remove(room.Name);
-                }
-                continue;
-            }
-
-            if (this.roomList.ContainsKey(room.Name))
-            {
-                this.roomList[room.Name] = room;
-            }
-            else
-            {
-                this.roomList.Add(room.Name, room);
-            }
+            PhotonNetwork.CreateRoom(null, roomOptions, TypedLobby.Default);
         }
-        /* Show rows in UI */
-        DisplayRooms();
     }
+
+    public override void OnLeftRoom()
+    {
+        if (pendingCreateRoom)
+        {
+            pendingCreateRoom = false;
+            StartCoroutine(FindOrCreateRoom());
+        }
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message) { CreateNewRoom(); }
 
     public override void OnCreatedRoom()
     {
@@ -281,6 +288,63 @@ public class MainMenu : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinLobby();
     }
 
+    private IEnumerator FindOrCreateRoom()
+    {
+        if (!PhotonNetwork.InLobby)
+        {
+            PhotonNetwork.JoinLobby();
+
+            float timeout = 3f;
+            while (!PhotonNetwork.InLobby && timeout > 0)
+            {
+                yield return new WaitForSeconds(0.1f);
+                timeout -= 0.1f;
+            }
+
+            if (!PhotonNetwork.InLobby) yield break;
+        }
+
+        roomList.Clear();
+        ClearRoomUI();
+        yield return new WaitForSeconds(0.5f);
+
+        /* Ask photon about rooms */
+        if (PhotonNetwork.InLobby)
+        {
+            PhotonNetwork.LeaveLobby();
+            yield return new WaitForSeconds(0.1f);
+            PhotonNetwork.JoinLobby();
+        }
+
+        float waitTime = 0f;
+        const float maxWaitTime = 5f;
+
+        while (roomList.Count == 0 && waitTime < maxWaitTime)
+        {
+            yield return new WaitForSeconds(0.1f);
+            waitTime += 0.1f;
+
+            if (roomList.Count > 0) break;
+        }
+
+        /* Check available rooms */
+        if (roomList.Count > 0)
+        {
+            foreach (var roomEntry in roomList)
+            {
+                var room = roomEntry.Value;
+                if (room.IsOpen && room.IsVisible && room.PlayerCount < room.MaxPlayers)
+                {
+                    PhotonNetwork.JoinRoom(room.Name);
+                    yield break;
+                }
+            }
+        }
+
+        /* Create new room if search failed*/
+        CreateNewRoom();
+    }
+
     ///public override void OnDisconnected(DisconnectCause cause) { Debug.Log("MainMenu::OnDisconnected - Disconected from Photon, error: " + cause); }
 
     ///public override void OnJoinRandomFailed(short returnCode, string message) { Debug.Log("MainMenu::OnJoinRandomFailed - there are no any open rooms"); }
@@ -292,20 +356,14 @@ public class MainMenu : MonoBehaviourPunCallbacks
     private void DisplayRooms()
     {
         ClearRoomUI();
-
-        if (roomList.Count == 0)
-        {
-            ///Debug.Log("MainMenu::DisplayRooms - roomList empty");
-            return;
-        }
+        if (roomList.Count == 0) return;
 
         /* Create row for every room */
         foreach (var roomEntry in roomList)
         {
-            RoomInfo room = roomEntry.Value;
+            var room = roomEntry.Value;
             CreateRoomUI(room);
         }
-        ///Debug.Log("MainMenu::DisplayRooms - Show " + roomList.Count + " rooms");
     }
 
     private void CreateRoomUI(RoomInfo room)
@@ -323,19 +381,19 @@ public class MainMenu : MonoBehaviourPunCallbacks
         }
 
         /* Create a copy */
-        GameObject roomElement = Instantiate(roomHorizontalGroup.gameObject, listGroupRooms.transform);
+        var roomElement = Instantiate(roomHorizontalGroup.gameObject, listGroupRooms.transform);
         roomElement.name = $"Room_{room.Name}";
 
         /* Button settings */
-        Button roomButton = roomElement.GetComponentInChildren<Button>();
+        var roomButton = roomElement.GetComponentInChildren<Button>();
         if (roomButton != null)
         {
-            string roomName = room.Name;
+            var roomName = room.Name;
             roomButton.onClick.RemoveAllListeners();
             roomButton.onClick.AddListener(() => OnRoomButtonClicked(roomName));
 
             /* Change color of the button */
-            TextMeshProUGUI buttonText = roomButton.GetComponentInChildren<TextMeshProUGUI>();
+            var buttonText = roomButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText != null)
             {
                 buttonText.text = room.Name;
@@ -343,8 +401,8 @@ public class MainMenu : MonoBehaviourPunCallbacks
         }
 
         /* Count of players settings */
-        TextMeshProUGUI[] allTexts = roomElement.GetComponentsInChildren<TextMeshProUGUI>();
-        foreach (TextMeshProUGUI text in allTexts)
+        var allTexts = roomElement.GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (var text in allTexts)
         {
             if (text.transform.parent != roomButton?.transform)
             {
@@ -374,6 +432,33 @@ public class MainMenu : MonoBehaviourPunCallbacks
         }
     }
 
+    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+    {
+        ///Debug.Log("MainMenu::OnRoomListUpdate - List of rooms: " + roomList.Count + " rooms");
+        foreach (RoomInfo room in roomList)
+        {
+            if (room.RemovedFromList)
+            {
+                if (this.roomList.ContainsKey(room.Name))
+                {
+                    this.roomList.Remove(room.Name);
+                }
+                continue;
+            }
+
+            if (this.roomList.ContainsKey(room.Name))
+            {
+                this.roomList[room.Name] = room;
+            }
+            else
+            {
+                this.roomList.Add(room.Name, room);
+            }
+        }
+        /* Show rows in UI */
+        DisplayRooms();
+    }
+
     private IEnumerator PlayAnimationReverse(Animator anim, string animationName, VerticalLayoutGroup groupToClose)
     {
         float animationLength = anim.GetCurrentAnimatorStateInfo(0).length;
@@ -391,4 +476,5 @@ public class MainMenu : MonoBehaviourPunCallbacks
         anim.Play(animationName, 0, 0f);
     }
     #endregion
+
 }
