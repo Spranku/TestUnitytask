@@ -19,17 +19,12 @@ public class GameManager : MonoBehaviourPunCallbacks
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        else { Destroy(gameObject); }
     }
 
     void Start() { TrySpawnPlayer(); }
 
     public override void OnJoinedRoom() { TrySpawnPlayer(); }
-
-    private void OnDestroy() { if (instance == this) instance = null; }
 
     public override void OnLeftRoom()
     {
@@ -68,10 +63,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         /* Spawn */
         localPlayerObject = PhotonNetwork.Instantiate(playerPrefab.name, spawnPosition, Quaternion.identity);
 
-        if (localPlayerObject != null)
-        {
-            SetPlayerSpawned(true);
-        }
+        if (localPlayerObject != null) { SetPlayerSpawned(true); }
     }
 
     private bool IsPlayerSpawned()
@@ -118,4 +110,5 @@ public class GameManager : MonoBehaviourPunCallbacks
         SceneManager.LoadScene(0);
     }
 
+    private void OnDestroy() { if (instance == this) instance = null; }
 }
